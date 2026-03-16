@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Bracket Tracker — The Frequency Framework</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --bg-deep: #0a0a0f;
+    --bg-card: #0f1118;
+    --bg-card-hover: #141722;
+    --border-subtle: rgba(212, 168, 67, 0.08);
+    --border-active: rgba(212, 168, 67, 0.25);
+    --amber: #d4a843;
+    --amber-dim: rgba(212, 168, 67, 0.6);
+    --amber-glow: rgba(212, 168, 67, 0.15);
+    --red: #dc4f4f;
+    --green: #4fdc6f;
+    --teal: #64dcdc;
+    --text-primary: #e8e8ec;
+    --text-secondary: #8a8a9a;
+    --text-dim: #55556a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg-deep); color: var(--text-primary); font-family: 'Rajdhani', sans-serif; min-height: 100vh; }
+
+  .bg-grid {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: linear-gradient(rgba(212,168,67,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(212,168,67,0.02) 1px, transparent 1px);
+    background-size: 40px 40px; z-index: 0;
+  }
+
+  .header { position: relative; z-index: 10; text-align: center; padding: 2.5rem 1.5rem 1rem; }
+  .header-badge { display: inline-block; font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--amber-dim); border: 1px solid var(--border-subtle); padding: 0.25rem 0.8rem; margin-bottom: 1rem; background: rgba(212,168,67,0.03); }
+  .header h1 { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: clamp(1.3rem, 3.5vw, 1.9rem); letter-spacing: 0.06em; margin-bottom: 0.3rem; }
+  .header h1 span { color: var(--amber); }
+  .header-sub { font-size: 0.9rem; color: var(--text-secondary); letter-spacing: 0.1em; max-width: 520px; margin: 0 auto; }
+
+  .container { position: relative; z-index: 10; max-width: 900px; margin: 0 auto; padding: 1rem 1.5rem 3rem; }
+
+  /* Stats Banner */
+  .stats-banner {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 1rem; text-align: center;
+  }
+  .stat-value { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.4rem; }
+  .stat-value.good { color: var(--green); }
+  .stat-value.mid { color: var(--amber); }
+  .stat-value.bad { color: var(--red); }
+  .stat-value.neutral { color: var(--teal); }
+  .stat-label { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-top: 0.2rem; }
+
+  /* Round Filter */
+  .round-filter {
+    display: flex; justify-content: center; gap: 0.3rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .rf-btn {
+    font-family: 'Rajdhani', sans-serif; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.35rem 0.8rem; border: 1px solid var(--border-subtle); background: transparent; color: var(--text-secondary);
+    cursor: pointer; transition: all 0.3s;
+  }
+  .rf-btn:hover { color: var(--text-primary); border-color: var(--border-active); background: var(--amber-glow); }
+  .rf-btn.active { color: var(--amber); border-color: var(--amber); background: var(--amber-glow); }
+
+  /* Game Cards */
+  .game-card {
+    display: flex; align-items: center; gap: 0.8rem;
+    background: var(--bg-card); border: 1px solid var(--border-subtle);
+    padding: 0.8rem 1.2rem; margin-bottom: 0.5rem;
+    transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .game-card::before { content: ''; position: absolute; left: 0; top: 0; width: 3px; height: 100%; }
+  .game-card.correct::before { background: var(--green); }
+  .game-card.wrong::before { background: var(--red); }
+  .game-card.pending::before { background: var(--amber); opacity: 0.5; }
+
+  .game-card:hover { background: var(--bg-card-hover); border-color: var(--border-active); }
+
+  .game-status { min-width: 24px; text-align: center; font-size: 1rem; }
+
+  .game-info { flex: 1; }
+  .game-matchup { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .game-seed { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; color: var(--amber-dim); }
+  .game-team { font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 0.8rem; }
+  .game-vs { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; color: var(--text-dim); }
+  .game-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; color: var(--text-dim); margin-top: 0.15rem; }
+
+  .game-pick { text-align: right; min-width: 100px; }
+  .pick-label { font-family: 'Share Tech Mono', monospace; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+  .pick-team { font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 0.75rem; color: var(--amber); }
+  .pick-conf { font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; }
+  .pick-conf.high { color: var(--green); }
+  .pick-conf.med { color: var(--amber); }
+  .pick-conf.low { color: var(--red); }
+
+  .game-result { text-align: right; min-width: 80px; }
+  .result-label { font-family: 'Share Tech Mono', monospace; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); }
+  .result-team { font-family: 'Orbitron', sans-serif; font-weight: 600; font-size: 0.75rem; }
+  .result-team.correct { color: var(--green); }
+  .result-team.wrong { color: var(--red); }
+  .result-score { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; color: var(--text-dim); }
+
+  .pending-tag {
+    font-family: 'Share Tech Mono', monospace; font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--amber-dim); padding: 0.15rem 0.5rem; border: 1px solid rgba(212,168,67,0.2); background: rgba(212,168,67,0.05);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  .note-banner {
+    background: linear-gradient(135deg, rgba(212,168,67,0.04), rgba(100,220,220,0.04));
+    border: 1px solid var(--border-subtle); padding: 1.2rem; text-align: center; margin-bottom: 1.5rem;
+  }
+  .note-text { font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--text-secondary); font-style: italic; }
+  .note-bold { color: var(--amber); font-weight: 600; font-style: normal; }
+
+  .footer { position: relative; z-index: 10; text-align: center; padding: 2rem 1rem; border-top: 1px solid var(--border-subtle); max-width: 900px; margin: 0 auto; }
+  .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+  .footer-links a { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color 0.3s; }
+  .footer-links a:hover { color: var(--amber); }
+  .footer-copy { font-family: 'Share Tech Mono', monospace; font-size: 0.55rem; color: var(--text-dim); }
+
+  @media (max-width: 600px) {
+    .stats-banner { grid-template-columns: repeat(2, 1fr); }
+    .game-matchup { flex-direction: column; align-items: flex-start; gap: 0.2rem; }
+    .game-pick, .game-result { min-width: 70px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+
+<header class="header">
+  <div class="header-badge">March Madness 2026 — Accountability Tracker</div>
+  <h1>LIVE BRACKET <span>TRACKER</span></h1>
+  <div class="header-sub">Framework picks vs actual results. Transparent accountability — our record, documented. Updated as games are played.</div>
+</header>
+
+<div class="container">
+
+  <div class="note-banner">
+    <div class="note-text">First Four begins <span class="note-bold">Tuesday, March 17</span>. First Round tips off <span class="note-bold">Thursday, March 19</span>. All picks are locked before tip-off. Results updated after each game.</div>
+  </div>
+
+  <div class="stats-banner" id="statsBanner">
+    <div class="stat-card"><div class="stat-value neutral" id="totalGames">0</div><div class="stat-label">Games Played</div></div>
+    <div class="stat-card"><div class="stat-value good" id="correctPicks">0</div><div class="stat-label">Correct Picks</div></div>
+    <div class="stat-card"><div class="stat-value bad" id="wrongPicks">0</div><div class="stat-label">Incorrect</div></div>
+    <div class="stat-card"><div class="stat-value mid" id="accuracy">—</div><div class="stat-label">Accuracy</div></div>
+  </div>
+
+  <div class="round-filter">
+    <button class="rf-btn active" data-round="all" onclick="filterRound('all')">All</button>
+    <button class="rf-btn" data-round="First Four" onclick="filterRound('First Four')">First Four</button>
+    <button class="rf-btn" data-round="Round of 64" onclick="filterRound('Round of 64')">Rd of 64</button>
+    <button class="rf-btn" data-round="Round of 32" onclick="filterRound('Round of 32')">Rd of 32</button>
+    <button class="rf-btn" data-round="Sweet 16" onclick="filterRound('Sweet 16')">Sweet 16</button>
+    <button class="rf-btn" data-round="Elite Eight" onclick="filterRound('Elite Eight')">Elite 8</button>
+    <button class="rf-btn" data-round="Final Four" onclick="filterRound('Final Four')">Final 4</button>
+    <button class="rf-btn" data-round="Championship" onclick="filterRound('Championship')">Title</button>
+  </div>
+
+  <div id="gameList"></div>
+</div>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="https://frequencyfw.github.io/Tools/">← Tool Hub</a>
+    <a href="https://frequencyframework.org">Website</a>
+    <a href="https://patreon.com/TheFrequencyFramework">Patreon</a>
+    <a href="https://x.com/TheFrequencyFW">@TheFrequencyFW</a>
+  </div>
+  <div class="footer-copy">© 2026 The Frequency Framework LLC. All rights reserved.</div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// GAMES DATA — Edit this section to update picks & results
+// Status: "pending" | "correct" | "wrong"
+// result_winner & result_score: fill in after game is played
+// ═══════════════════════════════════════════════════════════════
+
+const GAMES = [
+  // FIRST FOUR — March 17-18
+  { round: "First Four", region: "Midwest", seedA: 16, teamA: "UMBC", seedB: 16, teamB: "Howard", pick: "Howard", confidence: 52, status: "pending", result_winner: "", result_score: "", date: "Mar 17" },
+  { round: "First Four", region: "South", seedA: 16, teamA: "Prairie View", seedB: 16, teamB: "Lehigh", pick: "Lehigh", confidence: 55, status: "pending", result_winner: "", result_score: "", date: "Mar 17" },
+  { round: "First Four", region: "West", seedA: 11, teamA: "Texas", seedB: 11, teamB: "NC State", pick: "Texas", confidence: 54, status: "pending", result_winner: "", result_score: "", date: "Mar 18" },
+  { round: "First Four", region: "Midwest", seedA: 11, teamA: "Miami (OH)", seedB: 11, teamB: "SMU", pick: "Miami (OH)", confidence: 58, status: "pending", result_winner: "", result_score: "", date: "Mar 18" },
+
+  // ROUND OF 64 — EAST
+  { round: "Round of 64", region: "East", seedA: 1, teamA: "Duke", seedB: 16, teamB: "Siena", pick: "Duke", confidence: 98, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "East", seedA: 8, teamA: "Ohio State", seedB: 9, teamB: "TCU", pick: "TCU", confidence: 52, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "East", seedA: 5, teamA: "St. John's", seedB: 12, teamB: "Northern Iowa", pick: "Northern Iowa", confidence: 53, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "East", seedA: 4, teamA: "Kansas", seedB: 13, teamB: "Cal Baptist", pick: "Kansas", confidence: 86, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "East", seedA: 6, teamA: "Louisville", seedB: 11, teamB: "South Florida", pick: "South Florida", confidence: 52, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "East", seedA: 3, teamA: "Michigan State", seedB: 14, teamB: "N. Dakota St.", pick: "Michigan State", confidence: 92, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "East", seedA: 7, teamA: "UCLA", seedB: 10, teamB: "UCF", pick: "UCF", confidence: 54, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "East", seedA: 2, teamA: "UConn", seedB: 15, teamB: "Furman", pick: "UConn", confidence: 90, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+
+  // ROUND OF 64 — SOUTH
+  { round: "Round of 64", region: "South", seedA: 1, teamA: "Florida", seedB: 16, teamB: "PVAM/Lehigh", pick: "Florida", confidence: 98, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "South", seedA: 8, teamA: "Clemson", seedB: 9, teamB: "Iowa", pick: "Iowa", confidence: 54, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "South", seedA: 5, teamA: "Vanderbilt", seedB: 12, teamB: "McNeese", pick: "McNeese", confidence: 51, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "South", seedA: 4, teamA: "Nebraska", seedB: 13, teamB: "Troy", pick: "Nebraska", confidence: 62, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "South", seedA: 6, teamA: "North Carolina", seedB: 11, teamB: "VCU", pick: "VCU", confidence: 52, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "South", seedA: 3, teamA: "Illinois", seedB: 14, teamB: "Penn", pick: "Illinois", confidence: 88, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "South", seedA: 7, teamA: "Saint Mary's", seedB: 10, teamB: "Texas A&M", pick: "Saint Mary's", confidence: 54, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "South", seedA: 2, teamA: "Houston", seedB: 15, teamB: "Idaho", pick: "Houston", confidence: 94, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+
+  // ROUND OF 64 — WEST
+  { round: "Round of 64", region: "West", seedA: 1, teamA: "Arizona", seedB: 16, teamB: "LIU", pick: "Arizona", confidence: 99, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "West", seedA: 8, teamA: "Villanova", seedB: 9, teamB: "Utah State", pick: "Utah State", confidence: 56, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "West", seedA: 5, teamA: "Wisconsin", seedB: 12, teamB: "High Point", pick: "Wisconsin", confidence: 62, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "West", seedA: 4, teamA: "Arkansas", seedB: 13, teamB: "Hawaii", pick: "Arkansas", confidence: 75, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "West", seedA: 6, teamA: "BYU", seedB: 11, teamB: "TEX/NC State", pick: "TEX/NC State", confidence: 52, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "West", seedA: 3, teamA: "Gonzaga", seedB: 14, teamB: "Kennesaw St.", pick: "Gonzaga", confidence: 91, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "West", seedA: 7, teamA: "Miami (OH)", seedB: 10, teamB: "Missouri", pick: "Miami (OH)", confidence: 55, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "West", seedA: 2, teamA: "Purdue", seedB: 15, teamB: "Queens", pick: "Purdue", confidence: 93, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+
+  // ROUND OF 64 — MIDWEST
+  { round: "Round of 64", region: "Midwest", seedA: 1, teamA: "Michigan", seedB: 16, teamB: "UMBC/Howard", pick: "Michigan", confidence: 97, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "Midwest", seedA: 8, teamA: "Georgia", seedB: 9, teamB: "Saint Louis", pick: "Saint Louis", confidence: 60, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "Midwest", seedA: 5, teamA: "Texas Tech", seedB: 12, teamB: "Akron", pick: "Texas Tech", confidence: 58, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "Midwest", seedA: 4, teamA: "Alabama", seedB: 13, teamB: "Hofstra", pick: "Alabama", confidence: 68, status: "pending", result_winner: "", result_score: "", date: "Mar 19" },
+  { round: "Round of 64", region: "Midwest", seedA: 6, teamA: "Tennessee", seedB: 11, teamB: "M-OH/SMU", pick: "Tennessee", confidence: 56, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "Midwest", seedA: 3, teamA: "Virginia", seedB: 14, teamB: "Wright State", pick: "Virginia", confidence: 89, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "Midwest", seedA: 7, teamA: "Kentucky", seedB: 10, teamB: "Santa Clara", pick: "Santa Clara", confidence: 53, status: "pending", result_winner: "", result_score: "", date: "Mar 20" },
+  { round: "Round of 64", region: "Midwest", seedA: 2, teamA: "Iowa State", seedB: 15, teamB: "Tennessee St.", pick: "Iowa State", confidence: 95, status: "pending", result_winner: "", result_score: "", date: "Mar 20" }
+];
+
+// ═══════════════════════════════════════════════════════════════
+// RENDERING
+// ═══════════════════════════════════════════════════════════════
+
+function updateStats() {
+  const played = GAMES.filter(g => g.status !== "pending");
+  const correct = GAMES.filter(g => g.status === "correct");
+  const wrong = GAMES.filter(g => g.status === "wrong");
+
+  document.getElementById("totalGames").textContent = played.length;
+  document.getElementById("correctPicks").textContent = correct.length;
+  document.getElementById("wrongPicks").textContent = wrong.length;
+
+  if (played.length > 0) {
+    const pct = Math.round((correct.length / played.length) * 100);
+    const el = document.getElementById("accuracy");
+    el.textContent = pct + "%";
+    el.className = "stat-value " + (pct >= 70 ? "good" : pct >= 50 ? "mid" : "bad");
+  }
+}
+
+function getConfClass(c) {
+  if (c >= 75) return "high";
+  if (c >= 55) return "med";
+  return "low";
+}
+
+function renderGames(filter) {
+  const container = document.getElementById("gameList");
+  let games = filter === "all" ? GAMES : GAMES.filter(g => g.round === filter);
+
+  container.innerHTML = games.map(g => {
+    let resultHtml = "";
+    if (g.status === "pending") {
+      resultHtml = `<div class="game-result"><span class="pending-tag">Pending</span></div>`;
+    } else {
+      resultHtml = `<div class="game-result">
+        <div class="result-label">Result</div>
+        <div class="result-team ${g.status}">${g.result_winner}</div>
+        <div class="result-score">${g.result_score}</div>
+      </div>`;
+    }
+
+    return `
+    <div class="game-card ${g.status}">
+      <div class="game-status">${g.status === "correct" ? "✓" : g.status === "wrong" ? "✗" : "○"}</div>
+      <div class="game-info">
+        <div class="game-matchup">
+          <span class="game-seed">(${g.seedA})</span>
+          <span class="game-team">${g.teamA}</span>
+          <span class="game-vs">vs</span>
+          <span class="game-seed">(${g.seedB})</span>
+          <span class="game-team">${g.teamB}</span>
+        </div>
+        <div class="game-meta">${g.round} — ${g.region} — ${g.date}</div>
+      </div>
+      <div class="game-pick">
+        <div class="pick-label">Our Pick</div>
+        <div class="pick-team">${g.pick}</div>
+        <div class="pick-conf ${getConfClass(g.confidence)}">${g.confidence}%</div>
+      </div>
+      ${resultHtml}
+    </div>`;
+  }).join('');
+}
+
+function filterRound(round) {
+  document.querySelectorAll('.rf-btn').forEach(b => b.classList.toggle('active', b.dataset.round === round));
+  renderGames(round);
+}
+
+// Init
+updateStats();
+renderGames("all");
+</script>
+
+</body>
+</html>
