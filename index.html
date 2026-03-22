@@ -68,7 +68,7 @@
   .note-bold { color: var(--amber); font-weight: 600; font-style: normal; }
 
   .stats-banner {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem;
     margin-bottom: 1.5rem;
   }
   .stat-box {
@@ -193,13 +193,14 @@
 <div class="container">
 
   <div class="note-banner">
-    <div class="note-text">Last updated: <span class="note-bold">Sunday, March 22, 2026 — Morning</span>. First Four + Round of 64 + Round of 32 Saturday results entered. Sunday R32 games pending.</div>
+    <div class="note-text">Last updated: <span class="note-bold">Sunday, March 22, 2026 — Morning</span>. First Four + Round of 64 + R32 Saturday results entered. Sunday R32 picks locked in. <span class="note-bold">R64 + R32 Accuracy</span> excludes First Four (coin-flip play-in games). Overall includes all games.</div>
   </div>
 
   <div class="stats-banner">
     <div class="stat-box"><div class="stat-value" id="stat-played">0</div><div class="stat-label">Games Played</div></div>
     <div class="stat-box"><div class="stat-value" id="stat-correct">0</div><div class="stat-label">Correct</div></div>
-    <div class="stat-box"><div class="stat-value" id="stat-pct">0%</div><div class="stat-label">Accuracy</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-pct">0%</div><div class="stat-label">Overall Accuracy</div></div>
+    <div class="stat-box"><div class="stat-value" id="stat-tourney-pct" style="color:var(--green)">0%</div><div class="stat-label">R64 + R32 Accuracy</div></div>
     <div class="stat-box"><div class="stat-value" id="stat-pending">0</div><div class="stat-label">Pending</div></div>
   </div>
 
@@ -317,9 +318,14 @@ function updateStats() {
   const correct = GAMES.filter(g => g.status === 'correct');
   const pending = GAMES.filter(g => g.status === 'pending');
   const pct = played.length > 0 ? Math.round((correct.length / played.length) * 100) : 0;
+  // Tournament only (excludes First Four)
+  const tourneyPlayed = GAMES.filter(g => g.status !== 'pending' && g.round !== 'First Four');
+  const tourneyCorrect = GAMES.filter(g => g.status === 'correct' && g.round !== 'First Four');
+  const tourneyPct = tourneyPlayed.length > 0 ? Math.round((tourneyCorrect.length / tourneyPlayed.length) * 100) : 0;
   document.getElementById('stat-played').textContent = played.length;
   document.getElementById('stat-correct').textContent = correct.length;
   document.getElementById('stat-pct').textContent = pct + '%';
+  document.getElementById('stat-tourney-pct').textContent = tourneyPct + '%';
   document.getElementById('stat-pending').textContent = pending.length;
 }
 
