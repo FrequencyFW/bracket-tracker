@@ -208,7 +208,7 @@
 <div class="container">
 
   <div class="note-banner">
-    <div class="note-text">Last updated: <span class="note-bold">Monday, March 30, 2026</span>. All results entered through Elite 8. <span class="note-bold">Final Four set</span> — games Saturday, April 4. Championship Monday, April 6. Every <span class="note-bold">HIGH confidence</span> pick correct through the entire tournament.</div>
+    <div class="note-text">Last updated: <span class="note-bold">Tuesday, April 1, 2026</span>. All results entered through Elite 8. <span class="note-bold">Final Four set</span> — games Saturday, April 4. Championship Monday, April 6. Every <span class="note-bold">HIGH confidence</span> pick correct through the entire tournament.</div>
   </div>
 
   <div class="final-four-banner">
@@ -254,19 +254,14 @@
 </footer>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-// GAMES DATA — Updated through Elite 8
-// Updated: March 30, 2026
-// ═══════════════════════════════════════════════════════════════
-
 const GAMES = [
-  // ─── FIRST FOUR — March 17-18 ───────────────────────────────
+  // FIRST FOUR
   { round: "First Four", region: "Midwest", seedA: 16, teamA: "Howard", seedB: 16, teamB: "UMBC", pick: "UMBC", confidence: 50, status: "wrong", result_winner: "Howard", result_score: "86-83", date: "Mar 17" },
   { round: "First Four", region: "West", seedA: 11, teamA: "Texas", seedB: 11, teamB: "NC State", pick: "NC State", confidence: 50, status: "wrong", result_winner: "Texas", result_score: "68-66", date: "Mar 17" },
   { round: "First Four", region: "South", seedA: 16, teamA: "Prairie View", seedB: 16, teamB: "Lehigh", pick: "Lehigh", confidence: 55, status: "wrong", result_winner: "Prairie View", result_score: "67-55", date: "Mar 18" },
   { round: "First Four", region: "Midwest", seedA: 11, teamA: "Miami (OH)", seedB: 11, teamB: "SMU", pick: "SMU", confidence: 52, status: "wrong", result_winner: "Miami (OH)", result_score: "89-79", date: "Mar 18" },
 
-  // ─── ROUND OF 64 — Thursday, March 19 (Day 1) ──────────────
+  // ROUND OF 64 — Day 1
   { round: "Round of 64", region: "East", seedA: 1, teamA: "Duke", seedB: 16, teamB: "Siena", pick: "Duke", confidence: 98, status: "correct", result_winner: "Duke", result_score: "71-65", date: "Mar 19" },
   { round: "Round of 64", region: "East", seedA: 8, teamA: "Ohio State", seedB: 9, teamB: "TCU", pick: "Ohio State", confidence: 52, status: "wrong", result_winner: "TCU", result_score: "66-64", date: "Mar 19" },
   { round: "Round of 64", region: "East", seedA: 6, teamA: "Louisville", seedB: 11, teamB: "South Florida", pick: "South Florida", confidence: 70, status: "wrong", result_winner: "Louisville", result_score: "83-79", date: "Mar 19" },
@@ -301,7 +296,7 @@ const GAMES = [
   { round: "Round of 64", region: "Midwest", seedA: 7, teamA: "Kentucky", seedB: 10, teamB: "Santa Clara", pick: "Kentucky", confidence: 55, status: "correct", result_winner: "Kentucky", result_score: "89-84 OT", date: "Mar 20" },
   { round: "Round of 64", region: "Midwest", seedA: 2, teamA: "Iowa State", seedB: 15, teamB: "Tennessee St.", pick: "Iowa State", confidence: 96, status: "correct", result_winner: "Iowa State", result_score: "108-74", date: "Mar 20" },
 
-  // ─── ROUND OF 32 — Saturday, March 21 ──────────────────────
+  // ROUND OF 32
   { round: "Round of 32", region: "Midwest", seedA: 1, teamA: "Michigan", seedB: 9, teamB: "Saint Louis", pick: "Michigan", confidence: 92, status: "correct", result_winner: "Michigan", result_score: "95-72", date: "Mar 21" },
   { round: "Round of 32", region: "East", seedA: 3, teamA: "Michigan State", seedB: 6, teamB: "Louisville", pick: "Michigan State", confidence: 72, status: "correct", result_winner: "Michigan State", result_score: "77-69", date: "Mar 21" },
   { round: "Round of 32", region: "East", seedA: 1, teamA: "Duke", seedB: 9, teamB: "TCU", pick: "Duke", confidence: 88, status: "correct", result_winner: "Duke", result_score: "81-58", date: "Mar 21" },
@@ -310,7 +305,6 @@ const GAMES = [
   { round: "Round of 32", region: "South", seedA: 3, teamA: "Illinois", seedB: 11, teamB: "VCU", pick: "Illinois", confidence: 80, status: "correct", result_winner: "Illinois", result_score: "76-55", date: "Mar 21" },
   { round: "Round of 32", region: "South", seedA: 4, teamA: "Nebraska", seedB: 5, teamB: "Vanderbilt", pick: "Vanderbilt", confidence: 55, status: "wrong", result_winner: "Nebraska", result_score: "74-72", date: "Mar 21" },
   { round: "Round of 32", region: "West", seedA: 4, teamA: "Arkansas", seedB: 12, teamB: "High Point", pick: "Arkansas", confidence: 65, status: "correct", result_winner: "Arkansas", result_score: "94-88", date: "Mar 21" },
-  // Sunday, March 22
   { round: "Round of 32", region: "West", seedA: 2, teamA: "Purdue", seedB: 7, teamB: "Miami (FL)", pick: "Purdue", confidence: 78, status: "correct", result_winner: "Purdue", result_score: "79-69", date: "Mar 22" },
   { round: "Round of 32", region: "Midwest", seedA: 2, teamA: "Iowa State", seedB: 7, teamB: "Kentucky", pick: "Iowa State", confidence: 68, status: "correct", result_winner: "Iowa State", result_score: "82-63", date: "Mar 22" },
   { round: "Round of 32", region: "East", seedA: 5, teamA: "St. John's", seedB: 4, teamB: "Kansas", pick: "Kansas", confidence: 70, status: "wrong", result_winner: "St. John's", result_score: "67-65", date: "Mar 22" },
@@ -320,35 +314,29 @@ const GAMES = [
   { round: "Round of 32", region: "East", seedA: 7, teamA: "UCLA", seedB: 2, teamB: "UConn", pick: "UConn", confidence: 72, status: "correct", result_winner: "UConn", result_score: "73-57", date: "Mar 22" },
   { round: "Round of 32", region: "Midwest", seedA: 5, teamA: "Texas Tech", seedB: 4, teamB: "Alabama", pick: "Texas Tech", confidence: 55, status: "wrong", result_winner: "Alabama", result_score: "90-65", date: "Mar 22" },
 
-  // ─── SWEET 16 — Thursday, March 26 ─────────────────────────
+  // SWEET 16
   { round: "Sweet 16", region: "West", seedA: 2, teamA: "Purdue", seedB: 11, teamB: "Texas", pick: "Purdue", confidence: 80, status: "correct", result_winner: "Purdue", result_score: "72-63", date: "Mar 26" },
   { round: "Sweet 16", region: "South", seedA: 4, teamA: "Nebraska", seedB: 9, teamB: "Iowa", pick: "Nebraska", confidence: 55, status: "wrong", result_winner: "Iowa", result_score: "74-68", date: "Mar 26" },
   { round: "Sweet 16", region: "West", seedA: 1, teamA: "Arizona", seedB: 4, teamB: "Arkansas", pick: "Arizona", confidence: 78, status: "correct", result_winner: "Arizona", result_score: "109-78", date: "Mar 26" },
   { round: "Sweet 16", region: "South", seedA: 2, teamA: "Houston", seedB: 3, teamB: "Illinois", pick: "Houston", confidence: 68, status: "wrong", result_winner: "Illinois", result_score: "68-55", date: "Mar 26" },
-  // Friday, March 27
   { round: "Sweet 16", region: "East", seedA: 1, teamA: "Duke", seedB: 5, teamB: "St. John's", pick: "Duke", confidence: 75, status: "correct", result_winner: "Duke", result_score: "80-75", date: "Mar 27" },
   { round: "Sweet 16", region: "Midwest", seedA: 1, teamA: "Michigan", seedB: 4, teamB: "Alabama", pick: "Michigan", confidence: 80, status: "correct", result_winner: "Michigan", result_score: "90-77", date: "Mar 27" },
   { round: "Sweet 16", region: "East", seedA: 2, teamA: "UConn", seedB: 3, teamB: "Michigan State", pick: "UConn", confidence: 60, status: "correct", result_winner: "UConn", result_score: "67-63", date: "Mar 27" },
   { round: "Sweet 16", region: "Midwest", seedA: 2, teamA: "Iowa State", seedB: 6, teamB: "Tennessee", pick: "Iowa State", confidence: 65, status: "wrong", result_winner: "Tennessee", result_score: "76-62", date: "Mar 27" },
 
-  // ─── ELITE 8 — Saturday, March 28 ─────────────────────────
+  // ELITE 8
   { round: "Elite 8", region: "South", seedA: 3, teamA: "Illinois", seedB: 9, teamB: "Iowa", pick: "Illinois", confidence: 85, status: "correct", result_winner: "Illinois", result_score: "71-59", date: "Mar 28" },
   { round: "Elite 8", region: "West", seedA: 1, teamA: "Arizona", seedB: 2, teamB: "Purdue", pick: "Arizona", confidence: 82, status: "correct", result_winner: "Arizona", result_score: "79-64", date: "Mar 28" },
-  // Sunday, March 29
   { round: "Elite 8", region: "Midwest", seedA: 1, teamA: "Michigan", seedB: 6, teamB: "Tennessee", pick: "Michigan", confidence: 80, status: "correct", result_winner: "Michigan", result_score: "95-62", date: "Mar 29" },
   { round: "Elite 8", region: "East", seedA: 2, teamA: "UConn", seedB: 1, teamB: "Duke", pick: "Duke", confidence: 52, status: "wrong", result_winner: "UConn", result_score: "73-72", date: "Mar 29" },
 
-  // ─── FINAL FOUR — Saturday, April 4 ───────────────────────
+  // FINAL FOUR
   { round: "Final Four", region: "West vs Midwest", seedA: 1, teamA: "Arizona", seedB: 1, teamB: "Michigan", pick: "TBD", confidence: 0, status: "pending", result_winner: "", result_score: "", date: "Apr 4" },
   { round: "Final Four", region: "South vs East", seedA: 3, teamA: "Illinois", seedB: 2, teamB: "UConn", pick: "TBD", confidence: 0, status: "pending", result_winner: "", result_score: "", date: "Apr 4" },
 
-  // ─── CHAMPIONSHIP — Monday, April 6 ──────────────────────
+  // CHAMPIONSHIP
   { round: "Final Four", region: "Championship", seedA: 0, teamA: "TBD", seedB: 0, teamB: "TBD", pick: "TBD", confidence: 0, status: "pending", result_winner: "", result_score: "", date: "Apr 6" },
 ];
-
-// ═══════════════════════════════════════════════════════════════
-// AUTO-CALCULATE STATS & RENDER
-// ═══════════════════════════════════════════════════════════════
 
 function updateStats() {
   const played = GAMES.filter(g => g.status !== 'pending');
